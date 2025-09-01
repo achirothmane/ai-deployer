@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  ai:
+    image: oai-ai-core:latest  # سيتم تعديلها لاحقًا لمشروعك
+    ports: ["3000:3000"]
+    volumes:
+      - ./ai_data:/app/data
+    restart: unless-stopped
+
+  wordpress:
+    image: wordpress:latest
+    ports: ["8080:80"]
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wp
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: pass123
+    volumes:
+      - ./wp_data:/var/www/html
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wp
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: pass123
+    volumes:
+      - ./db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n
+    ports: ["5678:5678"]
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=adminpass
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    restart: unless-stopped
